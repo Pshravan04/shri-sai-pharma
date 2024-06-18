@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+   <style>
+    .card {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px 8px 0 0;
+}
+
+.product-name {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.product-detail {
+    margin-top: 5px;
+}
+
+   </style>
+</head>
+<body>
+    <div id="products" class="card-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <script>
+        // Function to handle file input
+function handleFile(e) {
+    const files = e.target.files;
+    if (files && files[0]) {
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            displayProducts(jsonData);
+        };
+        fileReader.readAsArrayBuffer(files[0]);
+    }
+}
+
+// Function to display products
+function displayProducts(data) {
+    const productsDiv = document.getElementById('products');
+    productsDiv.innerHTML = ''; // Clear previous content
+
+    const headers = data[0];
+    const products = data.slice(1); // Remove header row
+
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        // Assuming image URL is in the first column
+        const image = document.createElement('img');
+        image.src = product[0];
+        image.classList.add('product-image');
+        card.appendChild(image);
+
+        // Assuming product name is in the second column
+        const name = document.createElement('div');
+        name.textContent = product[1];
+        name.classList.add('product-name');
+        card.appendChild(name);
+
+        // Assuming other details follow after the name
+        for (let i = 2; i < product.length; i++) {
+            const detail = document.createElement('div');
+            detail.textContent = headers[i] + ': ' + product[i];
+            detail.classList.add('product-detail');
+            card.appendChild(detail);
+        }
+
+        productsDiv.appendChild(card);
+    });
+}
+
+// Attach file input listener
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = 'indiamart.xlsx';
+fileInput.addEventListener('change', handleFile);
+document.body.appendChild(fileInput);
+
+    </script>
+</body>
+</html>
