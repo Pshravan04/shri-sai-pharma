@@ -458,3 +458,6 @@ img.animated.pulse {
     background-color: rgb(204, 204, 6);
     color: aliceblue;
 }
+*{
+    outline: 2px solid red;
+}
